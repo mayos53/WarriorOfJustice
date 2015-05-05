@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">WarriorOfJustice</string>
+    <string name="loading_keywords">Synchronizing Keywords black list</string>
+    <string name="loading_blacklist_senders">Synchronizing Senders black list</string>
+    <string name="scanning_sms">Scanning SMS</string>
+
+</resources>

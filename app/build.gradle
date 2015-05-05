@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 15
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.money.warriorofjustice"
+        minSdkVersion 8
+        targetSdkVersion 17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/Parse-1.9.0.jar')
+    compile files('libs/ParseCrashReporting-1.9.0.jar')
+    compile files('libs/ParseFacebookUtilsV4-1.9.0.jar')
+    compile files('libs/android-support-v4.jar')
+    compile files('libs/bolts-android-1.1.4.jar')
+    compile files('libs/gson-2.2.4.jar')
+    compile files('libs/smslib-3.5.4.jar')
+    compile files('libs/smslib-3.5.4-javadoc.jar')
+}

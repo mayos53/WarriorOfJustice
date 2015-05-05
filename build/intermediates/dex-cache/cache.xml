@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/administrator/Downloads/WarriorOfJustice/app/libs/Parse-1.9.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="84e35209e48951a9eae3bf348fca9852fde3857d">
+        <dex dex="/Users/administrator/Downloads/WarriorOfJustice/app/build/intermediates/pre-dexed/debug/Parse-1.9.0-c81fbc015f12604f923e6969d69ac60f941c7907.jar" />
+    </item>
+    <item
+        jar="/Users/administrator/Downloads/WarriorOfJustice/app/libs/bolts-android-1.1.4.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="129874135e6081269ace2312092031558865de12">
+        <dex dex="/Users/administrator/Downloads/WarriorOfJustice/app/build/intermediates/pre-dexed/debug/bolts-android-1.1.4-87fcbcc1e909974d2e9e78995c5183431a690a49.jar" />
+    </item>
+    <item
+        jar="/Users/administrator/Downloads/WarriorOfJustice/app/libs/ParseCrashReporting-1.9.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="f42d74ec610e2961c8c8a56dffcd7485930b0e91">
+        <dex dex="/Users/administrator/Downloads/WarriorOfJustice/app/build/intermediates/pre-dexed/debug/ParseCrashReporting-1.9.0-3a850d0f9042666850cfefb908b939ef352d9d80.jar" />
+    </item>
+    <item
+        jar="/Users/administrator/Downloads/WarriorOfJustice/app/libs/ParseFacebookUtilsV4-1.9.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="99ddf5a6fe76c9eb2a45e249f5e053c722b93c7f">
+        <dex dex="/Users/administrator/Downloads/WarriorOfJustice/app/build/intermediates/pre-dexed/debug/ParseFacebookUtilsV4-1.9.0-07cdbf41ebdf1ff8112c9b7ace55292c58c1f9ae.jar" />
+    </item>
+    <item
+        jar="/Users/administrator/Downloads/WarriorOfJustice/app/libs/android-support-v4.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4a6be13368bb64c5a0b0460632d228a1a915f58f">
+        <dex dex="/Users/administrator/Downloads/WarriorOfJustice/app/build/intermediates/pre-dexed/debug/android-support-v4-e7d2bd6c3be53d242567d385cc9f07bc6885fcdb.jar" />
+    </item>
+
+</items>
