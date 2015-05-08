@@ -1,8 +1,9 @@
-package com.money.warriorofjustice.controller;
+package com.money.warriorofjustice.controller.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.money.warriorofjustice.network.NetworkClient;
 import com.money.warriorofjustice.network.requests.BaseRequest;
 import com.money.warriorofjustice.network.responses.BaseResponse;
 
@@ -14,11 +15,13 @@ public abstract class BaseTask<T extends BaseRequest,U, V extends BaseResponse> 
 
    protected Context context;
    protected TaskListener<V> listener;
+   protected NetworkClient networkClient;
 
 
     public BaseTask(Context context,TaskListener<V> listener){
        this.context = context;
        this.listener = listener;
+       networkClient = new NetworkClient();
    }
 
 

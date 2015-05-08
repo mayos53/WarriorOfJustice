@@ -5,12 +5,19 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.money.warriorofjustice.R;
+import com.money.warriorofjustice.WarriorOfJusticeApp;
+import com.money.warriorofjustice.controller.AppController;
+import com.money.warriorofjustice.model.Message;
 
 import java.util.Random;
 
@@ -20,8 +27,10 @@ import java.util.Random;
 
     public class SMSReceiver extends BroadcastReceiver {
 
+        private final static String SMS_INBOX_URI = "content://sms/inbox";
 
-        // Get the object of SmsManager
+
+    // Get the object of SmsManager
         final SmsManager sms = SmsManager.getDefault();
 
         public void onReceive(Context context, Intent intent) {
@@ -36,25 +45,17 @@ import java.util.Random;
                     final Object[] pdusObj = (Object[]) bundle.get("pdus");
 
                     String senderNum = null;
-                    String message = null;
 
                     for (int i = 0; i < pdusObj.length; i++) {
 
                         SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
                         String phoneNumber = currentMessage.getDisplayOriginatingAddress();
+                        long timeMessage = currentMessage.getTimestampMillis();
 
-                        senderNum = phoneNumber;
-                        message = currentMessage.getDisplayMessageBody();
-
-
+                        AppController.getInstance(context).processMessages(phoneNumber,timeMessage,null);
 
 
-                        Log.i("SmsReceiver", "senderNum: " + senderNum + "; message: " + message);
 
-                        // Show Alert
-                        int duration = Toast.LENGTH_LONG;
-                        Toast toast = Toast.makeText(context,
-                                "senderNum: "+ senderNum + ", message: " + message, duration);
                         // toast.show();
 
                     } // end for loop
@@ -78,20 +79,7 @@ import java.util.Random;
             }
         }
 
-        public void showSpamNotification(Context context, Spam spam){
-            NotificationCompat.Builder mBuilder =   new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.mipmap.ic_launcher) // notification icon
-                    .setContentTitle("הודעת ספאם") // title for notification
-                    .setContentText(" :התקבלה הודעה חשודה מאת" + spam.title) // message for notification
-                    .setAutoCancel(true); // clear notification after click
-            Intent intent = new Intent(context, MainActivity.class);
-            intent.putExtra("spam",true);
-            PendingIntent pi = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentIntent(pi);
-            NotificationManager mNotificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(0, mBuilder.build());
-        }
+
     }
 
 

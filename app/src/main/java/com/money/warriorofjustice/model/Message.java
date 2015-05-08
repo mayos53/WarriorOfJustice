@@ -1,14 +1,21 @@
 package com.money.warriorofjustice.model;
 
+import android.database.Cursor;
 import android.telephony.SmsMessage;
+
+import com.money.warriorofjustice.util.Utils;
 
 /**
  * Created by Yossef on 5/3/15.
  */
 public class Message {
 
-    public final static int MSG_PROCESS_CODE_SPAM = 1;
-    public final static int MSG_PROCESS_CODE_SPAM_POTENTIAL = 2;
+    public final static int MSG_PROCESS_CODE_OK = 1;
+    public final static int MSG_PROCESS_CODE_SPAM = 2;
+    public final static int MSG_PROCESS_CODE_PERSONAL_SPAM = 3;
+    public final static int MSG_PROCESS_CODE_SUSPECT = 4;
+
+
 
 
     private long id;
@@ -59,8 +66,14 @@ public class Message {
     }
 
 
-    public static Message fromSmsMessage(SmsMessage smsMessage){
+
+    public static Message fromCursor(Cursor cursor) {
         Message message = new Message();
-        message.setId(smsMessage.);
+        message.setContent(cursor.getString(cursor.getColumnIndex("body")));
+        message.setId(cursor.getLong(cursor.getColumnIndex("_id")));
+        message.setSender(cursor.getString(cursor.getColumnIndex("address")));
+        message.setTime(cursor.getLong(cursor.getColumnIndex("date")));
+        return message;
+
     }
 }

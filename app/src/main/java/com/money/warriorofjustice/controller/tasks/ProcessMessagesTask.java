@@ -4,17 +4,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.money.warriorofjustice.WarriorOfJusticeApp;
 import com.money.warriorofjustice.controller.AppController;
-import com.money.warriorofjustice.controller.BaseTask;
-import com.money.warriorofjustice.controller.ProcessMessagesResponse;
+import com.money.warriorofjustice.network.responses.ProcessMessagesResponse;
 import com.money.warriorofjustice.model.Message;
-import com.money.warriorofjustice.network.requests.BaseRequest;
+import com.money.warriorofjustice.network.requests.ProcessMessagesRequest;
 import com.money.warriorofjustice.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProcessMessagesTask extends BaseTask<BaseRequest, Void, ProcessMessagesResponse> {
+public class ProcessMessagesTask extends BaseTask<ProcessMessagesRequest, Void, ProcessMessagesResponse> {
 
     private final static String SMS_INBOX_URI = "content://sms/inbox";
     private AppController app;
@@ -25,55 +25,75 @@ public class ProcessMessagesTask extends BaseTask<BaseRequest, Void, ProcessMess
     }
 
     @Override
-    protected ProcessMessagesResponse doInBackground(BaseRequest... baseRequest) {
-
-        ProcessMessagesResponse response = new ProcessMessagesResponse();
-
-        List<Message> messages = new ArrayList<Message>();
-
-        Cursor cursor = context.getContentResolver().query(Uri.parse(SMS_INBOX_URI), null, null, null, null);
-        if (cursor.moveToFirst()) { // must check the result to prevent
-            String sender = cursor.getString(cursor.getColumnIndex("address"));
+    protected ProcessMessagesResponse doInBackground(ProcessMessagesRequest... request) {
 
 
-            // exception
-            do {
-                Message message = new Message();
-                message.setContent(cursor.getString(cursor.getColumnIndex("body")));
-                message.setId(cursor.getLong(cursor.getColumnIndex("_id")));
-                message.setSender(cursor.getString(cursor.getColumnIndex("address")));
-                message.setTime(cursor.getLong(cursor.getColumnIndex("date")));
+        String phoneNumber = request[0].getPhoneNumber();
+        String selection = null;
+        String[] selectionArgs = null;
+        String orderBy = null;
 
-                if (app.isInSendersBlackList(sender)) {
-                    message.setProcessCode(Message.MSG_PROCESS_CODE_SPAM);
-                    messages.add(message);
+        if (phoneNumber != null) {
+            selection = " address = ?";
+            selectionArgs = new String[]{phoneNumber};
+            orderBy = "date DESC";
+        }
 
-                } else {
-                    if (!Utils.contactExists(context, message.getSender())) {
-                        if (app.containsBlackListKeywords(message.getContent())) {
-                            message.setProcessCode(Message.MSG_PROCESS_CODE_SPAM_POTENTIAL);
-                            messages.add(message);
-                        }
-                    }
+        Cursor cursor = context.getContentResolver().query(Uri.parse(SMS_INBOX_URI),
+                null, selection, selectionArgs, orderBy);
 
-                }
+        List<Message> spamMessages = new ArrayList<Message>();
+        List<Message> suspectMessages = new ArrayList<Message>();
 
 
-//                for (int idx = 0; idx < cursor.getColumnCount(); idx++) {
-//                    String msgData = " " + cursor.getColumnName(idx) + ":" + cursor.getString(idx);
-//                    Log.d("MSG_DATA", msgData);
-//                }
-                // use msgData
+        while (cursor.moveToNext()) {
+            Message message = Message.fromCursor(cursor);
+            WarriorOfJusticeApp app = (WarriorOfJusticeApp) context.getApplicationContext();
+            int code = getMessageProcessCode(message);
+            message.setProcessCode(code);
+            switch (code){
+                case Message.MSG_PROCESS_CODE_SPAM:
+                    spamMessages.add(message);
+                break;
+
+                case Message.MSG_PROCESS_CODE_SUSPECT:
+                    suspectMessages.add(message);
+                break;
+
+
             }
-            while (cursor.moveToNext());
-
-            response.setMessages(messages.toArray(new Message[0]));
 
         }
-        return response;
+        cursor.close();
 
+        ProcessMessagesResponse processMessagesResponse = networkClient.reportMessages(spamMessages,
+                suspectMessages);
+        return processMessagesResponse;
     }
+
+
+    //<editor-fold desc="Message Utils">
+
+    public int getMessageProcessCode(Message message) {
+        if (app.isInSendersBlackList(message.getSender())) {
+            return Message.MSG_PROCESS_CODE_SPAM;
+
+        } else {
+            if (!Utils.contactExists(context, message.getSender())) {
+                if (app.containsBlackListKeywords(message.getContent())) {
+                    return Message.MSG_PROCESS_CODE_SUSPECT;
+                }
+            }
+        }
+        return Message.MSG_PROCESS_CODE_OK;
+    }
+
+
+
+    //</editor-fold>
+
 }
+
 
 
 

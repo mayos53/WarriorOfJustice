@@ -2,6 +2,7 @@ package com.money.warriorofjustice;
 
 import android.app.Application;
 
+import com.money.warriorofjustice.model.Message;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
@@ -30,6 +31,7 @@ public class WarriorOfJusticeApp extends Application {
         // defaultACL.setPublicReadAccess(true);
         ParseACL.setDefaultACL(defaultACL, true);
     }
+
 
 
 }

@@ -5,13 +5,19 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.money.warriorofjustice.SplashActivity;
+import com.money.warriorofjustice.OperationListener;
 import com.money.warriorofjustice.WarriorOfJusticeApp;
+import com.money.warriorofjustice.controller.tasks.BaseTask;
+import com.money.warriorofjustice.controller.tasks.ProcessMessagesTask;
+import com.money.warriorofjustice.controller.tasks.SyncBlackListTask;
 import com.money.warriorofjustice.model.Message;
+import com.money.warriorofjustice.network.requests.ProcessMessagesRequest;
+import com.money.warriorofjustice.network.requests.SyncBlackListRequest;
+import com.money.warriorofjustice.network.responses.ProcessMessagesResponse;
+import com.money.warriorofjustice.network.responses.SyncBlackListResponse;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -23,6 +29,8 @@ public class AppController
     private final static String SHARED_PREFERENCES = "SHARED_PREFERENCES";
     private final static String PREFERENCES_KEYWORDS = "PREFERENCES_KEYWORDS";
     private final static String PREFERENCES_SENDERS  = "PREFERENCES_SENDERS";
+    private final static String PREFERENCES_MESSAGES  = "PREFERENCES_MESSAGES";
+
 
 
 
@@ -53,33 +61,6 @@ public class AppController
         initMemoryArrays();
     }
 
-    private void initMemoryArrays(){
-        loadKeywords();
-        loadSenders();
-    }
-
-    private void loadKeywords(){
-        keywords = (String[])getObject(PREFERENCES_KEYWORDS,String[].class);
-    }
-
-    private void loadSenders(){
-        senders  = new HashSet<String>(Arrays.asList((String[])getObject(PREFERENCES_SENDERS,
-                String[].class)));    }
-
-    public boolean containsBlackListKeywords(String message){
-        for(String keyword:keywords){
-            if(message.contains(keyword)){
-                return true;
-            }
-        }
-        return false;
-  }
-
-    public boolean isInSendersBlackList(String sender){
-        return senders.contains(sender);
-    }
-
-
 
 
     public void saveKeywords(String [] keywords){
@@ -93,7 +74,19 @@ public class AppController
 
     }
 
-    //<editor-fold desc="SharedPrefs Utils">
+    public void updateMessageProcessCode(int id){
+
+    }
+
+    public void updateMessages(Message[] messages){
+
+    }
+
+    public void getMessages(int processCode){
+
+    }
+
+    //<editor-fold desc="SharedPrefs utils">
 
     private void putObject(String key,Object value){
         SharedPreferences.Editor editor = prefs.edit();
@@ -110,16 +103,109 @@ public class AppController
         return null;
     }
 
-    public void reportPotentialSpamMessage(Message message) {
-    }
 
-    public void receivedSpamMessage(Message message) {
-    }
 
-    public void setMessageRead(SplashActivity splashActivity, long id) {
-    }
 
     //</editor-fold>
+
+    //<editor-fold desc="Init data">
+    private void initMemoryArrays(){
+        loadKeywords();
+        loadSenders();
+    }
+
+    private void loadKeywords(){
+        keywords = (String[])getObject(PREFERENCES_KEYWORDS,String[].class);
+    }
+
+    private void loadSenders(){
+        senders  = new HashSet<String>(Arrays.asList((String[])getObject(PREFERENCES_SENDERS,
+                String[].class)));
+    }
+
+
+    //</editor-fold>
+
+    //<editor-fold desc="Operations">
+
+    public void processMessages(String sender,long time, final OperationListener listener) {
+
+        ProcessMessagesTask task = new ProcessMessagesTask(context,new BaseTask.TaskListener<ProcessMessagesResponse>() {
+            @Override
+            public void onSuccess(ProcessMessagesResponse response) {
+                updateMessages(response.getMessages());
+                if(listener != null){
+                    listener.onSuccess();
+                }
+
+            }
+
+            @Override
+            public void onError(int code) {
+                if(listener != null){
+                    listener.onError(code);
+                }
+            }
+        });
+        ProcessMessagesRequest request = new ProcessMessagesRequest();
+        request.setPhoneNumber(sender);
+        request.setTime(time);
+        task.execute(request);
+
+    }
+    public void syncBlackList(final OperationListener listener) {
+        SyncBlackListTask task = new SyncBlackListTask(context,
+        new BaseTask.TaskListener<SyncBlackListResponse>() {
+            @Override
+            public void onSuccess(SyncBlackListResponse response) {
+                saveSenders(response.getSenders());
+                saveKeywords(response.getSenders());
+                if(listener != null){
+                    listener.onSuccess();
+                }
+            }
+
+            @Override
+            public void onError(int code) {
+                if(listener != null){
+                    listener.onError(code);
+                }
+
+            }
+        });
+        SyncBlackListRequest request = new SyncBlackListRequest();
+        task.execute(request);
+
+    }
+
+
+
+
+
+
+    //</editor-fold>
+
+    public void setMessageRead(long id) {
+
+    }
+
+
+    public boolean containsBlackListKeywords(String message) {
+        for (String keyword : keywords) {
+            if (message.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isInSendersBlackList(String sender) {
+        return senders.contains(sender);
+    }
+
+
+
+
 
 
 }
