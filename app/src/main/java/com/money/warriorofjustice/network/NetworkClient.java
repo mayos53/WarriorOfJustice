@@ -12,7 +12,8 @@ import java.util.List;
 
 public class NetworkClient {
 
-	public final static String TABLE_BLACK_LIST_KEYWORDS = "BlackListKeywords";
+	//
+    public final static String TABLE_BLACK_LIST_KEYWORDS = "BlackListKeywords";
     public final static String TABLE_BLACK_LIST_SENDERS  = "BlackListSenders";
 
 
